@@ -1,0 +1,18 @@
+@'
+node_modules/
+.env
+.env.*
+!.env.example
+dist/
+build/
+private_uploads/
+uploads/
+*.log
+*.backup
+**/test-*.js
+**/test-*.pdf
+**/test-*.txt
+.vscode/
+.DS_Store
+Thumbs.db
+'@ | Set-Content -Path .\.gitignore

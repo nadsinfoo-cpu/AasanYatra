@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Environment files and secrets
+.env
+.env.*
+!.env.example
+
+# Build files
+dist/
+build/
+
+# Driver documents and uploads
+private_uploads/
+uploads/
+
+# Local test scripts
+backend/test-*.js
+
+# Logs
+*.log
+
+# Editor and system files
+.vscode/
+.DS_Store
+Thumbs.db
