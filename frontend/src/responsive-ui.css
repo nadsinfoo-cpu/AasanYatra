@@ -1,0 +1,194 @@
+﻿/* AasanYatra 2.0 - Responsive UI */
+
+:root {
+  --page-padding: clamp(10px, 1.5vw, 20px);
+  --section-gap: clamp(10px, 1.2vw, 16px);
+  --control-height: 40px;
+}
+
+html {
+  width: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  width: 100%;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  max-width: none !important;
+  min-width: 0;
+  min-height: 100dvh;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+img,
+video,
+svg {
+  max-width: 100%;
+}
+
+img,
+video {
+  height: auto;
+}
+
+/* Dashboard outer containers */
+
+.ay-admin,
+.pd-page {
+  width: 100%;
+  max-width: none !important;
+  min-width: 0;
+  margin: 0 !important;
+}
+
+.ay-admin main {
+  min-width: 0;
+  max-width: none !important;
+  padding: var(--page-padding) !important;
+}
+
+/* Booking management */
+
+.abm {
+  width: 100%;
+  min-width: 0;
+}
+
+.abm-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--section-gap);
+}
+
+.abm-filters {
+  display: grid !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  align-items: end !important;
+}
+
+.abm-filters > * {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+
+.abm-filters > input {
+  grid-column: span 2;
+}
+
+.abm-filters > label {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px;
+}
+
+.abm-filters input,
+.abm-filters select,
+.abm-filters button {
+  min-height: 40px;
+  max-width: 100%;
+}
+
+.abm-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Laptop */
+
+@media (max-width: 1199px) {
+  .abm-filters {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .abm-filters > input {
+    grid-column: span 2;
+  }
+}
+
+/* Tablet */
+
+@media (max-width: 900px) {
+  .ay-admin main {
+    padding: 12px !important;
+  }
+
+  .abm-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .abm-filters > input {
+    grid-column: span 2;
+  }
+
+  .abm-heading {
+    flex-wrap: wrap;
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 600px) {
+  :root {
+    --page-padding: 10px;
+    --section-gap: 10px;
+  }
+
+  .ay-admin main {
+    padding: 10px !important;
+  }
+
+  .abm-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .abm-filters {
+    grid-template-columns: 1fr !important;
+    padding: 10px !important;
+  }
+
+  .abm-filters > input {
+    grid-column: auto;
+  }
+
+  .abm-filters input,
+  .abm-filters select,
+  .abm-filters button {
+    width: 100%;
+    min-height: 42px;
+    font-size: 16px;
+  }
+
+  .abm-heading h2 {
+    font-size: 19px;
+  }
+
+  .abm-pagination {
+    flex-wrap: wrap;
+  }
+
+  .abm-modal {
+    width: 100%;
+    max-height: 90dvh;
+    padding: 16px;
+  }
+
+  .abm-details {
+    grid-template-columns: 1fr;
+  }
+}

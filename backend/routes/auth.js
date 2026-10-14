@@ -18,9 +18,11 @@ router.get("/me", authenticateToken, (req, res) => {
 
 
 
+const isLocalDevelopment = process.env.NODE_ENV === "development";
+
 const otpRequestLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    limit: 5,
+    limit: isLocalDevelopment ? 30 : 5,
     standardHeaders: true,
     legacyHeaders: false,
     message: {
@@ -31,7 +33,7 @@ const otpRequestLimiter = rateLimit({
 
 const otpVerifyLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    limit: 10,
+    limit: isLocalDevelopment ? 30 : 10,
     standardHeaders: true,
     legacyHeaders: false,
     message: {
@@ -226,7 +228,7 @@ router.post("/verify-otp", otpVerifyLimiter, async (req, res) => {
     } catch (error) {
         if (connection) await connection.rollback();
 
-        console.error("OTP verification failed:", error.message);
+        console.error("OTP verification failed:", error);
 
         res.status(500).json({
             success: false,

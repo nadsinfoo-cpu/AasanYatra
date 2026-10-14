@@ -40,7 +40,7 @@ router.get(
                         drop_city, pickup_datetime, vehicle_type,
                         passenger_count, estimated_fare, status
                  FROM bookings
-                 WHERE status = 'PENDING'
+                 WHERE status = 'CONFIRMED'
                    AND driver_id IS NULL
                    AND pickup_datetime > NOW()
                    AND vehicle_type = ?
@@ -71,6 +71,11 @@ router.patch(
     authenticateToken,
     authorizeRoles("DRIVER"),
     async (req, res) => {
+        return res.status(403).json({
+            success: false,
+            message: "Direct acceptance is disabled. Please use Request Ride."
+        });
+
         const bookingId = Number(req.params.id);
 
         if (!Number.isSafeInteger(bookingId) || bookingId < 1) {
@@ -145,7 +150,7 @@ router.patch(
             }
 
             if (
-                booking.status !== "PENDING" ||
+                booking.status !== "CONFIRMED" ||
                 booking.driver_id !== null
             ) {
                 await connection.rollback();
@@ -185,7 +190,7 @@ router.patch(
                 `UPDATE bookings
                  SET driver_id = ?, status = 'DRIVER_ASSIGNED'
                  WHERE id = ?
-                   AND status = 'PENDING'
+                   AND status = 'CONFIRMED'
                    AND driver_id IS NULL`,
                 [driver.id, bookingId]
             );
@@ -229,3 +234,4 @@ router.patch(
 );
 
 module.exports = router;
+

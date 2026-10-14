@@ -1,0 +1,484 @@
+.abm {
+  width: 100%;
+  min-width: 0;
+  padding: 4px;
+  color: #172033;
+}
+
+.abm-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+.abm-heading h2,
+.abm-heading h3 {
+  margin: 0 0 6px;
+}
+
+.abm-heading p {
+  margin: 0;
+  color: #64748b;
+}
+
+.abm button {
+  cursor: pointer;
+  border: 1px solid #dce3ee;
+  border-radius: 9px;
+  padding: 10px 14px;
+  background: white;
+  color: #334155;
+  font-weight: 600;
+}
+
+.abm button:hover:not(:disabled) {
+  background: #f1f5ff;
+}
+
+.abm button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.abm-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.abm-summary > div {
+  background: white;
+  border: 1px solid #e5eaf2;
+  border-radius: 14px;
+  padding: 18px;
+}
+
+.abm-summary small,
+.abm-summary strong {
+  display: block;
+}
+
+.abm-summary small {
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+.abm-summary strong {
+  font-size: 25px;
+}
+
+.abm-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: end;
+  background: white;
+  padding: 16px;
+  border: 1px solid #e5eaf2;
+  border-radius: 14px;
+  margin-bottom: 20px;
+}
+
+.abm-filters input,
+.abm-filters select {
+  min-width: 140px;
+  max-width: 100%;
+  border: 1px solid #dce3ee;
+  border-radius: 9px;
+  padding: 11px;
+  font: inherit;
+  background: white;
+  color: #172033;
+}
+
+.abm-filters > input {
+  flex: 1 1 230px;
+}
+
+.abm-filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.abm-filters button[type="submit"] {
+  background: #6548d8;
+  color: white;
+  border-color: #6548d8;
+}
+
+.abm-table-wrap {
+  overflow-x: auto;
+  background: white;
+  border: 1px solid #e5eaf2;
+  border-radius: 14px;
+}
+
+.abm table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 980px;
+  text-align: left;
+}
+
+.abm th,
+.abm td {
+  padding: 15px 13px;
+  border-bottom: 1px solid #edf0f5;
+  font-size: 13px;
+}
+
+.abm th {
+  background: #f8faff;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.abm td small {
+  display: block;
+  color: #64748b;
+  margin-top: 5px;
+}
+
+.abm-status {
+  display: inline-block;
+  background: #eef2ff;
+  color: #5141a6;
+  border-radius: 30px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.abm-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.abm-pagination > div {
+  display: flex;
+  gap: 8px;
+}
+
+.abm-empty,
+.abm-error {
+  padding: 16px;
+}
+
+.abm-error {
+  color: #b91c1c;
+}
+
+.abm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(15, 23, 42, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+
+.abm-modal {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  width: min(650px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.abm-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.abm-details div {
+  border-bottom: 1px solid #edf0f5;
+  padding-bottom: 10px;
+  overflow-wrap: anywhere;
+}
+
+.abm-details dt {
+  color: #64748b;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+
+.abm-details dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+@media (max-width: 700px) {
+  .abm-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .abm-details {
+    grid-template-columns: 1fr;
+  }
+
+  .abm-filters > * {
+    flex: 1 1 100%;
+  }
+}
+
+/* Admin Booking Management layout override */
+
+.ay-admin .abm {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.ay-admin .abm *,
+.ay-admin .abm *::before,
+.ay-admin .abm *::after {
+  box-sizing: border-box;
+}
+
+/* Fix oversized search and filter controls */
+
+.ay-admin .abm .abm-filters {
+  display: grid !important;
+  grid-template-columns:
+    minmax(200px, 2fr) minmax(140px, 1fr) minmax(150px, 1fr)
+    minmax(150px, 1fr) auto auto;
+  align-items: end !important;
+  gap: 12px !important;
+  width: 100%;
+  padding: 16px;
+}
+
+.ay-admin .abm .abm-filters > input,
+.ay-admin .abm .abm-filters > select,
+.ay-admin .abm .abm-filters > label,
+.ay-admin .abm .abm-filters > button {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 42px;
+  margin: 0 !important;
+  flex: initial !important;
+  position: static !important;
+}
+
+.ay-admin .abm .abm-filters input,
+.ay-admin .abm .abm-filters select {
+  width: 100% !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  padding: 9px 12px !important;
+  font-size: 13px !important;
+  border-radius: 9px !important;
+  background: #fff !important;
+}
+
+.ay-admin .abm .abm-filters label {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 5px !important;
+  font-size: 12px !important;
+  line-height: 1.4 !important;
+}
+
+.ay-admin .abm .abm-filters button {
+  padding: 9px 14px !important;
+  white-space: nowrap;
+  font-size: 13px !important;
+}
+
+.ay-admin .abm .abm-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.ay-admin .abm .abm-summary {
+  width: 100%;
+}
+
+/* Tablet */
+
+@media (max-width: 1200px) {
+  .ay-admin .abm .abm-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 650px) {
+  .ay-admin .abm .abm-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .ay-admin .abm .abm-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .ay-admin .abm .abm-heading,
+  .ay-admin .abm .abm-pagination {
+    flex-wrap: wrap;
+  }
+}
+
+/* FINAL COMPACT BOOKING FILTER LAYOUT */
+
+@media (min-width: 1100px) {
+  .ay-admin .abm .abm-filters {
+    display: grid !important;
+    grid-template-columns:
+      minmax(180px, 2fr)
+      minmax(125px, 1fr)
+      minmax(135px, 1fr)
+      minmax(135px, 1fr)
+      78px
+      72px !important;
+    gap: 8px !important;
+    align-items: end !important;
+    padding: 12px !important;
+    margin-bottom: 14px !important;
+    width: 100% !important;
+  }
+
+  .ay-admin .abm .abm-filters > * {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding-top: 0;
+    padding-bottom: 0;
+    align-self: end !important;
+    flex: none !important;
+  }
+
+  .ay-admin .abm .abm-filters > input,
+  .ay-admin .abm .abm-filters > select,
+  .ay-admin .abm .abm-filters > button {
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+  }
+
+  .ay-admin .abm .abm-filters > label {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    height: auto !important;
+    min-height: 0 !important;
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+  }
+
+  .ay-admin .abm .abm-filters > label > input {
+    width: 100% !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    margin: 0 !important;
+  }
+
+  .ay-admin .abm .abm-filters input,
+  .ay-admin .abm .abm-filters select {
+    font-size: 12px !important;
+    padding: 6px 9px !important;
+  }
+
+  .ay-admin .abm .abm-filters button {
+    padding: 6px 8px !important;
+    font-size: 12px !important;
+    white-space: nowrap;
+  }
+}
+
+/* Smaller desktop and tablet */
+
+@media (min-width: 701px) and (max-width: 1099px) {
+  .ay-admin .abm .abm-filters {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    align-items: end !important;
+    padding: 12px !important;
+  }
+
+  .ay-admin .abm .abm-filters > * {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+
+  .ay-admin .abm .abm-filters > label {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    height: auto !important;
+  }
+
+  .ay-admin .abm .abm-filters input,
+  .ay-admin .abm .abm-filters select,
+  .ay-admin .abm .abm-filters button {
+    height: 38px !important;
+    min-height: 38px !important;
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 700px) {
+  .ay-admin .abm .abm-filters {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    padding: 12px !important;
+  }
+
+  .ay-admin .abm .abm-filters > * {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+
+  .ay-admin .abm .abm-filters > label {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    height: auto !important;
+  }
+}
+
+/* Compact cards and heading */
+
+.ay-admin .abm .abm-summary {
+  gap: 10px !important;
+  margin-bottom: 14px !important;
+}
+
+.ay-admin .abm .abm-summary > div {
+  padding: 12px 14px !important;
+}
+
+.ay-admin .abm .abm-heading {
+  margin-bottom: 12px !important;
+}
+
+.ay-admin .abm .abm-table-wrap {
+  margin-top: 0 !important;
+}

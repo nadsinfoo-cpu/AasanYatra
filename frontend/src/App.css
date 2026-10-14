@@ -1,4 +1,3 @@
-
 * {
   box-sizing: border-box;
 }
@@ -30,8 +29,7 @@ input {
   justify-content: center;
   padding: 32px 18px;
   background:
-    radial-gradient(circle at top left, #dff5eb 0, transparent 36%),
-    #f4f7fb;
+    radial-gradient(circle at top left, #dff5eb 0, transparent 36%), #f4f7fb;
 }
 
 .brand {

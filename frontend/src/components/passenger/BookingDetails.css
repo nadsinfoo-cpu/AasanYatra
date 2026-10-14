@@ -1,0 +1,151 @@
+.bd-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.bd-modal {
+  width: 100%;
+  max-width: 620px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+  border-radius: 18px;
+  background: #fff;
+  color: #172033;
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.2);
+}
+
+.bd-heading,
+.bd-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.bd-heading h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.bd-heading button,
+.bd-actions button {
+  border: 1px solid #dce3eb;
+  border-radius: 9px;
+  padding: 10px 16px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.bd-reference {
+  margin: 18px 0;
+  color: #6251ca;
+  font-weight: 700;
+}
+
+.bd-route {
+  display: grid;
+  gap: 6px;
+  padding: 18px;
+  border-radius: 12px;
+  background: #f6f7fc;
+}
+
+.bd-route strong {
+  font-size: 17px;
+}
+
+.bd-route span {
+  color: #697386;
+  font-size: 13px;
+}
+
+.bd-route-arrow {
+  color: #6251ca;
+  font-size: 22px;
+}
+
+.bd-info {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin: 24px 0;
+}
+
+.bd-info > div {
+  display: grid;
+  gap: 5px;
+}
+
+.bd-info small {
+  color: #697386;
+  font-size: 12px;
+}
+
+.bd-info strong {
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.bd-timeline {
+  display: grid;
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.bd-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #9299a8;
+  font-size: 14px;
+}
+
+.bd-dot {
+  width: 13px;
+  height: 13px;
+  border: 2px solid #b8c0ce;
+  border-radius: 50%;
+}
+
+.bd-step.done {
+  color: #087f5b;
+  font-weight: 700;
+}
+
+.bd-step.done .bd-dot {
+  border-color: #087f5b;
+  background: #087f5b;
+}
+
+.bd-actions {
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.bd-actions .bd-danger {
+  background: #fff0f0;
+  border-color: #f4b4b4;
+  color: #b42318;
+}
+
+.bd-error,
+.bd-cancelled {
+  color: #b42318;
+}
+
+@media (max-width: 560px) {
+  .bd-modal {
+    padding: 18px;
+  }
+
+  .bd-info {
+    grid-template-columns: 1fr;
+  }
+}

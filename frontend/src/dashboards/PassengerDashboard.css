@@ -1,0 +1,380 @@
+.pd-page {
+    min-height: 100vh;
+    background: #f5f6fb;
+    color: #20243a;
+    font-family: Inter, system-ui, Arial, sans-serif;
+}
+
+.pd-page * {
+    box-sizing: border-box;
+}
+
+.pd-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 17px max(24px, calc((100vw - 1200px) / 2));
+    background: white;
+    border-bottom: 1px solid #e7e9f2;
+    gap: 16px;
+}
+
+.pd-header>div:first-child {
+    display: flex;
+    flex-direction: column;
+}
+
+.pd-header strong {
+    font-size: 22px;
+    color: #5d45d8;
+}
+
+.pd-header span {
+    font-size: 12px;
+    color: #6f7485;
+}
+
+.pd-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pd-header button,
+.pd-row button {
+    border: 1px solid #e2e4ef;
+    background: white;
+    border-radius: 9px;
+    padding: 9px 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    color: #34364a;
+}
+
+.pd-main {
+    max-width: 1200px;
+    margin: auto;
+    padding: 28px 20px 60px;
+}
+
+.pd-hero {
+    background: linear-gradient(115deg, #5b42cc, #8870f0);
+    border-radius: 18px;
+    padding: 28px 32px;
+    color: white;
+    margin-bottom: 24px;
+}
+
+.pd-hero p {
+    font-size: 11px;
+    letter-spacing: 2px;
+    margin: 0 0 9px;
+    opacity: 0.85;
+}
+
+.pd-hero h1 {
+    font-size: 29px;
+    margin: 0 0 8px;
+}
+
+.pd-hero span {
+    opacity: 0.9;
+}
+
+.pd-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(290px, 1fr);
+    gap: 22px;
+    align-items: start;
+}
+
+.pd-card {
+    background: white;
+    border: 1px solid #e9eaf2;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 8px 26px #29245d0b;
+}
+
+.pd-card h2 {
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 0 0 20px;
+}
+
+.pd-trips {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 22px;
+}
+
+.pd-trips button {
+    border: 1px solid #e2e3ef;
+    border-radius: 10px;
+    background: #fafaff;
+    padding: 12px 4px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #53576d;
+}
+
+.pd-trips button.selected {
+    border-color: #6650df;
+    background: #eeeaff;
+    color: #513acb;
+}
+
+.pd-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 17px;
+}
+
+.pd-grid>div {
+    min-width: 0;
+}
+
+.pd-grid label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #41465b;
+    margin-bottom: 7px;
+}
+
+.pd-grid input,
+.pd-grid select {
+    width: 100%;
+    border: 1px solid #dfe2ee;
+    background: #fff;
+    border-radius: 9px;
+    padding: 12px;
+    font: inherit;
+    color: #24263a;
+    min-height: 45px;
+}
+
+.pd-grid input:focus,
+.pd-grid select:focus {
+    outline: 2px solid #c8bfff;
+    border-color: #6650df;
+}
+
+.pd-city-wrap {
+    position: relative;
+}
+
+.pd-city-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background: white;
+    max-height: 190px;
+    overflow: auto;
+    border: 1px solid #dfe2ee;
+    border-radius: 9px;
+    box-shadow: 0 10px 20px #2222;
+}
+
+.pd-city-results button {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 11px 12px;
+    background: white;
+    border: 0;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    text-align: left;
+}
+
+.pd-city-results button:hover {
+    background: #f3f0ff;
+}
+
+.pd-city-results small {
+    color: #85889a;
+}
+
+.pd-note {
+    font-size: 12px;
+    color: #767c8e;
+    line-height: 1.5;
+}
+
+.pd-submit {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 9px;
+    border: 0;
+    border-radius: 10px;
+    background: #6249d8;
+    color: white;
+    padding: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.pd-submit:disabled {
+    opacity: 0.65;
+}
+
+.pd-side {
+    display: grid;
+    gap: 20px;
+}
+
+.pd-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.pd-stats div {
+    background: #f5f3ff;
+    border-radius: 12px;
+    padding: 15px 8px;
+    text-align: center;
+    display: grid;
+    gap: 4px;
+}
+
+.pd-stats strong {
+    font-size: 25px;
+    color: #5b42cc;
+}
+
+.pd-stats span {
+    font-size: 12px;
+    color: #74798b;
+}
+
+.pd-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pd-row h2 {
+    margin-bottom: 12px;
+}
+
+.pd-empty {
+    color: #85899a;
+    font-size: 14px;
+}
+
+.pd-booking-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 12px;
+}
+
+.pd-booking-row>div {
+    display: grid;
+    gap: 4px;
+}
+
+.pd-booking-row small {
+    color: #7a7d8f;
+}
+
+.pd-booking-row>span {
+    font-size: 11px;
+    color: #5946c4;
+}
+
+.pd-error {
+    color: #b42318;
+}
+
+.pd-success {
+    color: #087d43;
+}
+
+@media (max-width: 850px) {
+    .pd-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .pd-header {
+        padding: 15px 20px;
+    }
+}
+
+@media (max-width: 560px) {
+    .pd-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pd-trips {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .pd-hero {
+        padding: 22px;
+    }
+
+    .pd-hero h1 {
+        font-size: 23px;
+    }
+
+    .pd-card {
+        padding: 17px;
+    }
+
+    .pd-header-actions>span {
+        display: none;
+    }
+}
+
+.pd-booking-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.pd-view-details {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 14px;
+    border: 1px solid #0d9488;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #0f766e;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.pd-view-details:hover {
+    background: #f0fdfa;
+}
+
+@media (max-width: 480px) {
+    .pd-booking-row {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .pd-booking-actions {
+        align-items: flex-start;
+    }
+}

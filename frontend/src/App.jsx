@@ -1,13 +1,18 @@
-
-import { useState } from "react";
+﻿import { useEffect, useState } from "react";
 import {
   requestOtp,
   verifyOtp,
+  getCurrentUser,
   getMyBookings,
   cancelBooking,
   createBooking,
 } from "./services/api";
 import "./App.css";
+import "./LoginPage.css";
+import LoginPage from "./LoginPage";
+import AdminDashboard from "./dashboards/AdminDashboard";
+import PassengerDashboard from "./dashboards/PassengerDashboard";
+import DriverDashboard from "./dashboards/DriverDashboard";
 
 const FARE_RATES = {
   ONE_WAY: { baseFare: 50, perKm: 12, multiplier: 1 },
@@ -29,9 +34,7 @@ function calculateEstimatedFare(bookingType, distanceKm) {
     return 0;
   }
 
-  return Math.round(
-    rate.baseFare + distance * rate.perKm * rate.multiplier
-  );
+  return Math.round(rate.baseFare + distance * rate.perKm * rate.multiplier);
 }
 
 const initialBookingForm = {
@@ -53,6 +56,55 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [user, setUser] = useState(null);
+  const [activeDashboard, setActiveDashboard] = useState(() => {
+    const savedMode = localStorage.getItem("aasanyatra_dashboard_mode");
+
+    return ["PASSENGER", "DRIVER", "SUPER_ADMIN"].includes(savedMode) ? savedMode : "PASSENGER";
+  });
+
+  const [checkingSession, setCheckingSession] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+
+    async function restoreSession() {
+      const token = localStorage.getItem("aasanyatra_token");
+
+      if (!token) {
+        if (active) setCheckingSession(false);
+        return;
+      }
+
+      try {
+        const result = await getCurrentUser();
+
+        if (active) {
+          setUser(result.user);
+        }
+      } catch (error) {
+        if (active) {
+          // Remove the token only if the server rejected it.
+          if (
+            error.message.includes("Invalid or expired login token") ||
+            error.message.includes("Please log in") ||
+            error.message.includes("Account inactive")
+          ) {
+            localStorage.removeItem("aasanyatra_token");
+          }
+
+          setMessage(error.message || "Unable to restore session.");
+        }
+      } finally {
+        if (active) setCheckingSession(false);
+      }
+    }
+
+    restoreSession();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const [bookings, setBookings] = useState([]);
   const [bookingsLoading, setBookingsLoading] = useState(false);
@@ -63,9 +115,9 @@ export default function App() {
   const [distanceKm, setDistanceKm] = useState("");
 
   const estimatedFare = calculateEstimatedFare(
-  bookingForm.booking_type,
-  distanceKm
-);
+    bookingForm.booking_type,
+    distanceKm,
+  );
 
   // Request OTP using a 10-digit Indian mobile number.
   async function handleRequestOtp(e) {
@@ -85,16 +137,13 @@ export default function App() {
 
       setOtpSent(true);
       setOtp("");
-      setMessage(
-        result.message || "OTP requested successfully."
-      );
+      setMessage(result.message || "OTP requested successfully.");
     } catch (error) {
       setMessage(error.message || "Unable to request OTP.");
     } finally {
       setLoading(false);
     }
   }
-  
 
   // Verify OTP and log in.
   async function handleVerifyOtp(e) {
@@ -184,13 +233,11 @@ export default function App() {
 
       const result = await createBooking({
         ...booking,
-       distance_km: Number(distanceKm),
-        });
+        distance_km: Number(distanceKm),
+      });
       setMessage(
         result.message ||
-          `Booking created: ${
-            result.booking?.booking_reference || ""
-          }`
+          `Booking created: ${result.booking?.booking_reference || ""}`,
       );
 
       setBookingForm({ ...initialBookingForm });
@@ -206,7 +253,7 @@ export default function App() {
   // Cancel an eligible booking.
   async function handleCancelBooking(bookingId) {
     const confirmed = window.confirm(
-      `Are you sure you want to cancel booking #${bookingId}?`
+      `Are you sure you want to cancel booking #${bookingId}?`,
     );
 
     if (!confirmed) return;
@@ -244,14 +291,112 @@ export default function App() {
     }));
   }
 
+  const userRoles = Array.isArray(user?.roles) ? user.roles : [];
+
+  const isSuperAdmin = userRoles.includes("SUPER_ADMIN");
+
+  function switchDashboard(role) {
+    if (!["PASSENGER", "DRIVER", "SUPER_ADMIN"].includes(role)) {
+      return;
+    }
+
+    if (!userRoles.includes(role)) {
+      return;
+    }
+
+    localStorage.setItem("aasanyatra_dashboard_mode", role);
+    setActiveDashboard(role);
+  }
   const minimumPickup = new Date(
-    Date.now() - new Date().getTimezoneOffset() * 60000
+    Date.now() - new Date().getTimezoneOffset() * 60000,
   )
     .toISOString()
     .slice(0, 16);
 
+  if (
+    !checkingSession &&
+    user &&
+    activeDashboard === "SUPER_ADMIN" &&
+    isSuperAdmin
+  ) {
+    return (
+      <AdminDashboard
+        user={user}
+        onSwitchDashboard={() => switchDashboard("PASSENGER")}
+        onLogout={() => {
+          handleLogout();
+          setActiveDashboard("PASSENGER");
+          localStorage.removeItem("aasanyatra_dashboard_mode");
+          setActiveDashboard("PASSENGER");
+        }}
+      />
+    );
+  }
+  if (!checkingSession && user && activeDashboard === "DRIVER" && userRoles.includes("DRIVER")) {
+    return (
+      <DriverDashboard
+        user={user}
+        onLogout={handleLogout}
+        onSwitchDashboard={() => switchDashboard("PASSENGER")}
+      />
+    );
+  }
+
+  if (user && activeDashboard === "PASSENGER") {
+    return (
+      <PassengerDashboard
+        user={user}
+        onLogout={handleLogout}
+        onSwitchDashboard={
+          isSuperAdmin ? () => switchDashboard("SUPER_ADMIN") : undefined
+        }
+        onSwitchDriverDashboard={
+          userRoles.includes("DRIVER")
+            ? () => switchDashboard("DRIVER")
+            : undefined
+        }
+      />
+    );
+  }
+  if (!user || checkingSession) {
+    return (
+      <LoginPage
+        phone={phone}
+        setPhone={setPhone}
+        otp={otp}
+        setOtp={setOtp}
+        otpSent={otpSent}
+        loading={loading}
+        message={message}
+        checkingSession={checkingSession}
+        onRequestOtp={handleRequestOtp}
+        onVerifyOtp={handleVerifyOtp}
+        onChangeNumber={() => {
+          setOtpSent(false);
+          setOtp("");
+          setMessage("");
+        }}
+      />
+    );
+  }
   return (
-    <main className="page">
+    <main className="page ay-login-page">
+      <header className="ay-login-header">
+        <strong>AasanYatra 2.0</strong>
+        <nav aria-label="Main navigation">
+          <a href="/">Home</a>
+          <span> | </span>
+          <a href="/support">Support</a>
+        </nav>
+      </header>
+
+      <div className="ay-news">
+        <span>NEWS</span>
+        <p>
+          🚕 Welcome to AasanYatra 2.0 • Expanding across North India • Book
+          rides easily
+        </p>
+      </div>
       <header className="brand">
         <div className="brand-icon">A</div>
         <div>
@@ -261,19 +406,17 @@ export default function App() {
       </header>
 
       <section className="login-card">
-        {!user ? (
+        {checkingSession ? (
+          <p>Checking your login session...</p>
+        ) : !user ? (
           <>
             <div className="card-heading">
               <span className="eyebrow">WELCOME ABOARD</span>
               <h2>Welcome to AasanYatra</h2>
-              <p>
-                Enter your mobile number to log in or create your account.
-              </p>
+              <p>Enter your mobile number to log in or create your account.</p>
             </div>
 
-            <form
-              onSubmit={otpSent ? handleVerifyOtp : handleRequestOtp}
-            >
+            <form onSubmit={otpSent ? handleVerifyOtp : handleRequestOtp}>
               <label htmlFor="phone">Mobile number</label>
 
               <div className="phone-input">
@@ -290,9 +433,7 @@ export default function App() {
                   required
                   disabled={otpSent || loading}
                   onChange={(e) =>
-                    setPhone(
-                      e.target.value.replace(/\D/g, "").slice(0, 10)
-                    )
+                    setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
                   }
                 />
               </div>
@@ -311,9 +452,7 @@ export default function App() {
                     pattern="[0-9]{6}"
                     required
                     onChange={(e) =>
-                      setOtp(
-                        e.target.value.replace(/\D/g, "").slice(0, 6)
-                      )
+                      setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
                     }
                   />
 
@@ -328,9 +467,7 @@ export default function App() {
                 type="submit"
                 disabled={
                   loading ||
-                  (otpSent
-                    ? otp.length !== 6
-                    : !/^[6-9]\d{9}$/.test(phone))
+                  (otpSent ? otp.length !== 6 : !/^[6-9]\d{9}$/.test(phone))
                 }
               >
                 {loading
@@ -370,7 +507,16 @@ export default function App() {
           </>
         ) : (
           <div className="success-panel">
-            <div className="success-icon">✓</div>
+            {isSuperAdmin && (
+              <button
+                type="button"
+                className="primary-button"
+                onClick={() => switchDashboard("SUPER_ADMIN")}
+              >
+                Open Super Admin Dashboard
+              </button>
+            )}
+            <div className="success-icon">âœ“</div>
             <h2>Welcome to AasanYatra!</h2>
             <p>You are successfully logged in.</p>
 
@@ -399,10 +545,7 @@ export default function App() {
               <h2>Book a Cab</h2>
               <p>Enter your journey details to request a cab.</p>
 
-              <form
-                onSubmit={handleCreateBooking}
-                className="booking-form"
-              >
+              <form onSubmit={handleCreateBooking} className="booking-form">
                 <label htmlFor="booking_type">Trip type</label>
                 <select
                   id="booking_type"
@@ -414,9 +557,7 @@ export default function App() {
                   <option value="ONE_WAY">One Way</option>
                   <option value="ROUND_TRIP">Round Trip</option>
                   <option value="LOCAL">Local</option>
-                  <option value="AIRPORT_TRANSFER">
-                    Airport Transfer
-                  </option>
+                  <option value="AIRPORT_TRANSFER">Airport Transfer</option>
                 </select>
 
                 <label htmlFor="pickup_address">Pickup address</label>
@@ -464,34 +605,31 @@ export default function App() {
                   placeholder="e.g. Jaipur"
                   maxLength={100}
                 />
-                
-<div className="form-group">
-  <label htmlFor="distanceKm">
-    Estimated Distance (km)
-  </label>
 
-  <input
-    id="distanceKm"
-    type="number"
-    min="1"
-    step="1"
-    placeholder="Enter trip distance in km"
-    value={distanceKm}
-    onChange={(event) => setDistanceKm(event.target.value)}
-    required
-  />
-</div>
+                <div className="form-group">
+                  <label htmlFor="distanceKm">Estimated Distance (km)</label>
 
-<div className="fare-preview">
-  <span>Estimated Fare</span>
-  <strong>₹{estimatedFare.toLocaleString("en-IN")}</strong>
-  <small>Final fare may vary based on actual trip details.</small>
-</div>
+                  <input
+                    id="distanceKm"
+                    type="number"
+                    min="1"
+                    step="1"
+                    placeholder="Enter trip distance in km"
+                    value={distanceKm}
+                    onChange={(event) => setDistanceKm(event.target.value)}
+                    required
+                  />
+                </div>
 
+                <div className="fare-preview">
+                  <span>Estimated Fare</span>
+                  <strong>â‚¹{estimatedFare.toLocaleString("en-IN")}</strong>
+                  <small>
+                    Final fare may vary based on actual trip details.
+                  </small>
+                </div>
 
-                <label htmlFor="pickup_datetime">
-                  Pickup date and time
-                </label>
+                <label htmlFor="pickup_datetime">Pickup date and time</label>
                 <input
                   id="pickup_datetime"
                   type="datetime-local"
@@ -512,14 +650,9 @@ export default function App() {
                       id="return_datetime"
                       type="datetime-local"
                       value={bookingForm.return_datetime}
-                      min={
-                        bookingForm.pickup_datetime || minimumPickup
-                      }
+                      min={bookingForm.pickup_datetime || minimumPickup}
                       onChange={(e) =>
-                        updateBookingField(
-                          "return_datetime",
-                          e.target.value
-                        )
+                        updateBookingField("return_datetime", e.target.value)
                       }
                       required
                     />
@@ -537,14 +670,10 @@ export default function App() {
                   <option value="HATCHBACK">Hatchback</option>
                   <option value="SEDAN">Sedan</option>
                   <option value="SUV">SUV</option>
-                  <option value="TEMPO_TRAVELLER">
-                    Tempo Traveller
-                  </option>
+                  <option value="TEMPO_TRAVELLER">Tempo Traveller</option>
                 </select>
 
-                <label htmlFor="passenger_count">
-                  Number of passengers
-                </label>
+                <label htmlFor="passenger_count">Number of passengers</label>
                 <input
                   id="passenger_count"
                   type="number"
@@ -554,7 +683,7 @@ export default function App() {
                   onChange={(e) =>
                     updateBookingField(
                       "passenger_count",
-                      Number(e.target.value)
+                      Number(e.target.value),
                     )
                   }
                   required
@@ -569,9 +698,7 @@ export default function App() {
                   className="primary-button"
                   disabled={bookingLoading}
                 >
-                  {bookingLoading
-                    ? "Creating booking..."
-                    : "Request Cab"}
+                  {bookingLoading ? "Creating booking..." : "Request Cab"}
                 </button>
               </form>
             </section>
@@ -609,15 +736,11 @@ export default function App() {
 
                     <p>
                       <strong>Type:</strong>{" "}
-                      {(booking.booking_type || "N/A").replaceAll(
-                        "_",
-                        " "
-                      )}
+                      {(booking.booking_type || "N/A").replaceAll("_", " ")}
                     </p>
 
                     <p>
-                      <strong>Pickup:</strong>{" "}
-                      {booking.pickup_address || "N/A"}
+                      <strong>Pickup:</strong> {booking.pickup_address || "N/A"}
                     </p>
 
                     <p>
@@ -628,14 +751,12 @@ export default function App() {
                     <p>
                       <strong>Pickup time:</strong>{" "}
                       {booking.pickup_datetime
-                        ? new Date(
-                            booking.pickup_datetime
-                          ).toLocaleString()
+                        ? new Date(booking.pickup_datetime).toLocaleString()
                         : "Not available"}
                     </p>
 
                     <p>
-                      <strong>Estimated fare:</strong> ₹
+                      <strong>Estimated fare:</strong> â‚¹
                       {Number(booking.estimated_fare || 0).toFixed(2)}
                     </p>
 
@@ -646,23 +767,16 @@ export default function App() {
                           booking.status || "pending"
                         ).toLowerCase()}`}
                       >
-                        {(booking.status || "PENDING").replaceAll(
-                          "_",
-                          " "
-                        )}
+                        {(booking.status || "PENDING").replaceAll("_", " ")}
                       </span>
                     </p>
 
-                    {["PENDING", "CONFIRMED"].includes(
-                      booking.status
-                    ) && (
+                    {["PENDING", "CONFIRMED"].includes(booking.status) && (
                       <button
                         type="button"
                         className="cancel-button"
                         disabled={cancellingId === booking.id}
-                        onClick={() =>
-                          handleCancelBooking(booking.id)
-                        }
+                        onClick={() => handleCancelBooking(booking.id)}
                       >
                         {cancellingId === booking.id
                           ? "Cancelling..."
@@ -685,7 +799,7 @@ export default function App() {
         )}
       </section>
 
-                 <div className="support-contact">
+      <div className="support-contact">
         <strong>AasanYatra Support</strong>
         <p>
           Phone: <a href="tel:7895865387">7895865387</a>
@@ -698,3 +812,5 @@ export default function App() {
     </main>
   );
 }
+
+

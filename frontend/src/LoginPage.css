@@ -1,0 +1,485 @@
+.ayl-page {
+  min-height: 100vh;
+  background: #f8fafc;
+  color: #171923;
+  font-family: Inter, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.ayl-page * {
+  box-sizing: border-box;
+}
+.ayl-header {
+  min-height: 75px;
+  padding: 13px clamp(18px, 3.3vw, 56px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: #fff;
+  border-bottom: 1px solid #e9edf4;
+}
+.ayl-brand {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: #14161d;
+  line-height: 1.15;
+}
+.ayl-brand strong {
+  font-size: clamp(21px, 2vw, 27px);
+  letter-spacing: -0.8px;
+}
+.ayl-brand strong span,
+.ayl-marketing-top h1 span {
+  color: #514be3;
+}
+.ayl-brand small {
+  margin-top: 4px;
+  color: #69748b;
+  font-size: 12px;
+}
+.ayl-header nav {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  color: #69748b;
+}
+.ayl-header nav a {
+  color: #303746;
+  text-decoration: none;
+}
+.ayl-header nav a:hover,
+.ayl-footer a:hover {
+  text-decoration: underline;
+}
+.ayl-ticker {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #eaf3ff;
+  padding: 10px clamp(16px, 2.5vw, 42px);
+  height: 55px;
+  overflow: hidden;
+}
+.ayl-news-label {
+  z-index: 1;
+  flex: none;
+  border-radius: 22px;
+  background: #3987f6;
+  color: white;
+  padding: 5px 15px;
+  font-weight: 750;
+  font-size: 14px;
+}
+.ayl-ticker-viewport {
+  overflow: hidden;
+  flex: 1;
+  min-width: 0;
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 3%,
+    #000 97%,
+    transparent
+  );
+}
+.ayl-ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ayl-marquee 42s linear infinite;
+}
+.ayl-ticker-group {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding-right: 28px;
+  white-space: nowrap;
+}
+.ayl-ticker-group b {
+  margin-left: 25px;
+  color: #67809e;
+}
+.ayl-ticker:hover .ayl-ticker-track {
+  animation-play-state: paused;
+}
+@keyframes ayl-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.ayl-shell {
+  width: min(1360px, calc(100% - 48px));
+  margin: 26px auto 18px;
+  display: grid;
+  grid-template-columns: 1.08fr 0.92fr;
+  min-height: 580px;
+  background: #fff;
+  border: 1px solid #e5e9f0;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 16px 55px #283e5912;
+}
+.ayl-marketing {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-width: 0;
+  padding: 36px 42px 32px;
+  background: linear-gradient(
+    120deg,
+    #fff1a6 0%,
+    #d6f5ff 45%,
+    #b9e8ff 78%,
+    #fff5c0 100%
+  );
+}
+.ayl-marketing-top {
+  position: relative;
+  z-index: 1;
+}
+.ayl-marketing-top h1 {
+  font-size: clamp(26px, 3vw, 40px);
+  letter-spacing: -1px;
+  margin: 0;
+  font-weight: 800;
+  line-height: 1.2;
+}
+.ayl-marketing-top p {
+  font-size: 18px;
+  margin: 5px 0 0;
+  color: #354156;
+}
+.ayl-slide-window {
+  height: 265px;
+  position: relative;
+  margin: 14px 0 5px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.ayl-slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transform: scale(1.03);
+  transition:
+    opacity 0.65s ease,
+    transform 5s ease;
+}
+.ayl-slide.is-active {
+  opacity: 1;
+  transform: scale(1);
+}
+.ayl-marketing-bottom {
+  margin-top: auto;
+}
+.ayl-marketing-bottom h2 {
+  font-size: 23px;
+  letter-spacing: -0.5px;
+  margin: 8px 0 3px;
+}
+.ayl-marketing-bottom > p {
+  color: #48546b;
+  margin: 0 0 12px;
+}
+.ayl-dots {
+  display: flex;
+  gap: 7px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+.ayl-dots button {
+  width: 8px;
+  height: 8px;
+  border: 0;
+  border-radius: 99px;
+  background: #9eb9c6;
+  cursor: pointer;
+  padding: 0;
+}
+.ayl-dots button.active {
+  width: 23px;
+  background: #25879f;
+}
+.ayl-features {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.ayl-features > div {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #344158;
+}
+.ayl-features svg {
+  flex: none;
+  color: #25879f;
+}
+.ayl-login {
+  display: flex;
+  align-items: center;
+  padding: 40px clamp(28px, 4vw, 62px);
+}
+.ayl-form-content {
+  width: 100%;
+  max-width: 520px;
+  margin: auto;
+}
+.ayl-form-content h2 {
+  font-size: clamp(26px, 2.6vw, 34px);
+  letter-spacing: -0.8px;
+  margin: 0 0 6px;
+}
+.ayl-subtitle {
+  color: #687187;
+  font-size: 16px;
+  margin: 0 0 35px;
+}
+.ayl-login form {
+  display: flex;
+  flex-direction: column;
+}
+.ayl-login form label {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 9px;
+}
+.ayl-phone-field {
+  display: flex;
+  align-items: center;
+  border: 1px solid #d6dce7;
+  border-radius: 11px;
+  min-height: 58px;
+  margin-bottom: 20px;
+  background: #fff;
+  overflow: hidden;
+}
+.ayl-phone-field:focus-within {
+  outline: 2px solid #b7dce7;
+  border-color: #25879f;
+}
+.ayl-phone-field span {
+  padding: 0 17px;
+  border-right: 1px solid #e3e7ef;
+  font-size: 17px;
+}
+.ayl-phone-field input {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  min-height: 55px;
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  margin: 0 !important;
+  padding: 0 15px !important;
+  background: transparent;
+  font-size: 15px;
+}
+.ayl-otp-field {
+  width: 100%;
+  border: 1px solid #d6dce7;
+  border-radius: 11px;
+  min-height: 54px;
+  margin: 0 0 8px;
+  padding: 0 15px;
+  font-size: 17px;
+  letter-spacing: 3px;
+}
+.ayl-dev-note {
+  font-size: 12px;
+  color: #65748a;
+  margin: 0 0 12px;
+}
+.ayl-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 58px;
+  border: 0;
+  border-radius: 11px;
+  background: #25869d;
+  color: white;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.ayl-submit:hover:not(:disabled) {
+  background: #1a7086;
+}
+.ayl-submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.ayl-change {
+  display: block;
+  margin: 14px auto 0;
+  border: 0;
+  background: none;
+  color: #237c94;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ayl-message {
+  font-size: 13px;
+  color: #365f77;
+  margin: 12px 0;
+}
+.ayl-secure {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  color: #687187;
+  font-size: 13px;
+  margin: 19px 0 26px;
+}
+.ayl-or {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #8790a1;
+  font-size: 13px;
+  margin-bottom: 26px;
+}
+.ayl-or:before,
+.ayl-or:after {
+  content: "";
+  height: 1px;
+  background: #e0e5ed;
+  flex: 1;
+}
+.ayl-benefits {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.ayl-benefits > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #e8edf4;
+  background: #fbfcff;
+  padding: 16px 13px;
+  border-radius: 11px;
+}
+.ayl-benefits svg {
+  color: #3686e5;
+  flex: none;
+}
+.ayl-benefits span {
+  display: grid;
+  gap: 3px;
+}
+.ayl-benefits strong {
+  font-size: 13px;
+}
+.ayl-benefits small {
+  color: #748096;
+  font-size: 12px;
+}
+.ayl-footer {
+  text-align: center;
+  color: #768096;
+  font-size: 12px;
+  padding: 0 15px 20px;
+}
+.ayl-footer > div {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.ayl-footer a {
+  color: inherit;
+  text-decoration: none;
+}
+.ayl-footer p {
+  margin: 6px 0 0;
+}
+@media (max-width: 920px) {
+  .ayl-shell {
+    grid-template-columns: 1fr;
+    width: min(650px, calc(100% - 28px));
+  }
+  .ayl-marketing {
+    padding: 25px 28px;
+  }
+  .ayl-slide-window {
+    height: 215px;
+  }
+  .ayl-login {
+    padding: 30px 28px;
+  }
+  .ayl-features {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 520px) {
+  .ayl-header {
+    min-height: 65px;
+  }
+  .ayl-header nav {
+    gap: 7px;
+    font-size: 13px;
+  }
+  .ayl-brand strong {
+    font-size: 20px;
+  }
+  .ayl-brand small {
+    font-size: 10px;
+  }
+  .ayl-ticker {
+    height: 49px;
+  }
+  .ayl-marketing {
+    padding: 22px 18px;
+  }
+  .ayl-marketing-top p {
+    font-size: 14px;
+  }
+  .ayl-slide-window {
+    height: 175px;
+  }
+  .ayl-marketing-bottom h2 {
+    font-size: 19px;
+  }
+  .ayl-marketing-bottom > p {
+    font-size: 13px;
+  }
+  .ayl-login {
+    padding: 30px 19px;
+  }
+  .ayl-subtitle {
+    font-size: 14px;
+    margin-bottom: 23px;
+  }
+  .ayl-benefits {
+    gap: 8px;
+  }
+  .ayl-benefits > div {
+    padding: 10px 7px;
+    gap: 6px;
+  }
+  .ayl-benefits strong {
+    font-size: 12px;
+  }
+  .ayl-benefits small {
+    font-size: 11px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ayl-ticker-track {
+    animation: none;
+  }
+  .ayl-slide {
+    transition: none;
+  }
+}

@@ -162,6 +162,117 @@ router.post("/register", authenticateToken, async (req, res) => {
   }
 });
 
+/**
+ * DRIVER: Resubmit rejected profile
+ * PATCH /api/drivers/resubmit
+ */
+router.patch("/resubmit", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user?.userId ?? req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Please log in to continue."
+      });
+    }
+
+    const [profiles] = await db.execute(
+      `SELECT id, approval_status
+       FROM driver_profiles
+       WHERE user_id = ?
+       LIMIT 1`,
+      [userId]
+    );
+
+    if (profiles.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Driver profile not found."
+      });
+    }
+
+    const driver = profiles[0];
+
+    if (driver.approval_status !== "REJECTED") {
+      return res.status(409).json({
+        success: false,
+        message: "Only rejected driver profiles can be resubmitted."
+      });
+    }
+
+    const requiredTypes = [
+      "DRIVING_LICENSE",
+      "VEHICLE_RC",
+      "INSURANCE"
+    ];
+
+    const [documents] = await db.execute(
+      `SELECT d.document_type
+       FROM driver_documents d
+       WHERE d.driver_id = ?
+         AND d.verification_status IN ('PENDING', 'VERIFIED')
+         AND (d.expiry_date IS NULL OR d.expiry_date >= CURRENT_DATE())
+         AND d.id > COALESCE((
+           SELECT MAX(r.id)
+           FROM driver_documents r
+           WHERE r.driver_id = d.driver_id
+             AND r.document_type = d.document_type
+             AND r.verification_status = 'REJECTED'
+         ), 0)
+       GROUP BY d.document_type`,
+      [driver.id]
+    );
+
+    const submittedTypes = new Set(
+      documents.map(doc => doc.document_type)
+    );
+
+    const missingDocuments = requiredTypes.filter(
+      type => !submittedTypes.has(type)
+    );
+
+    if (missingDocuments.length > 0) {
+      return res.status(409).json({
+        success: false,
+        message: "Upload replacement documents before resubmitting.",
+        missing_documents: missingDocuments
+      });
+    }
+
+    const [result] = await db.execute(
+      `UPDATE driver_profiles
+       SET approval_status = 'PENDING',
+           admin_notes = NULL,
+           updated_at = CURRENT_TIMESTAMP
+       WHERE id = ? AND approval_status = 'REJECTED'`,
+      [driver.id]
+    );
+
+    if (result.affectedRows !== 1) {
+      return res.status(409).json({
+        success: false,
+        message: "Driver profile status changed. Please try again."
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "Driver profile resubmitted for admin review.",
+      driver_id: driver.id,
+      approval_status: "PENDING"
+    });
+
+  } catch (error) {
+    console.error("Driver resubmission error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to resubmit driver profile."
+    });
+  }
+});
+
 // GET /api/drivers/me
 // View the logged-in user's driver profile.
 router.get("/me", authenticateToken, async (req, res) => {
@@ -434,7 +545,49 @@ router.get(
         }
     }
 );
+// SUPER ADMIN: Get all driver documents
+router.get(
+  "/admin/documents/all",
+  authenticateToken,
+  authorizeRoles("SUPER_ADMIN"),
+  async (req, res) => {
+    try {
+      const [documents] = await db.execute(
+        `SELECT
+          dd.id,
+          dd.driver_id,
+          dd.document_type,
+          dd.document_number,
+          dd.expiry_date,
+          dd.verification_status,
+          dd.admin_notes,
+          dd.created_at,
+          dd.reviewed_at,
+          dp.user_id,
+          u.full_name,
+          u.phone
+        FROM driver_documents dd
+        INNER JOIN driver_profiles dp ON dp.id = dd.driver_id
+        INNER JOIN users u ON u.id = dp.user_id
+        ORDER BY dd.created_at DESC
+        LIMIT 100`
+      );
 
+      return res.json({
+        success: true,
+        count: documents.length,
+        documents
+      });
+    } catch (error) {
+      console.error("All documents error:", error.message);
+
+      return res.status(500).json({
+        success: false,
+        message: "Unable to retrieve all documents."
+      });
+    }
+  }
+);
 // ADMIN: Approve or reject a pending document
 router.patch(
     "/admin/documents/:documentId/review",
@@ -1121,5 +1274,141 @@ router.patch(
         }
     }
 );
+// SUPER ADMIN: Secure driver document viewing
+router.get(
+  "/admin/documents/:documentId/view",
+  authenticateToken,
+  authorizeRoles("SUPER_ADMIN"),
+  async (req, res) => {
+    try {
+      const documentId = Number(req.params.documentId);
 
+      if (!Number.isSafeInteger(documentId) || documentId <= 0) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid document ID."
+        });
+      }
+
+      const [rows] = await db.query(
+        "SELECT file_path FROM driver_documents WHERE id = ? LIMIT 1",
+        [documentId]
+      );
+
+      if (rows.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "Document not found."
+        });
+      }
+
+      const fs = require("fs");
+      const storedPath = rows[0].file_path;
+
+      if (typeof storedPath !== "string" || !storedPath.trim()) {
+        return res.status(404).json({
+          success: false,
+          message: "Document file unavailable."
+        });
+      }
+
+      // Only allow files within the private upload directory.
+     const root = path.resolve(uploadDirectory);
+
+// Database paths start with "driver_documents/".
+// Accept only that folder prefix and a single safe filename.
+const normalizedPath = storedPath.replace(/\\/g, "/");
+
+const match = /^driver_documents\/([a-f0-9-]{36}\.(?:pdf|jpg|jpeg|png))$/i.exec(
+  normalizedPath
+);
+
+if (!match) {
+  return res.status(403).json({
+    success: false,
+    message: "Invalid stored document path."
+  });
+}
+
+const filePath = path.resolve(root, match[1]);
+const relativePath = path.relative(root, filePath);
+
+      if (
+        relativePath === "" ||
+        relativePath === ".." ||
+        relativePath.startsWith(".." + path.sep) ||
+        path.isAbsolute(relativePath)
+      ) {
+        return res.status(403).json({
+          success: false,
+          message: "Invalid document path."
+        });
+      }
+
+      const extension = path.extname(filePath).toLowerCase();
+
+      const mimeTypes = {
+        ".pdf": "application/pdf",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".png": "image/png"
+      };
+
+      if (!mimeTypes[extension]) {
+        return res.status(415).json({
+          success: false,
+          message: "Unsupported document format."
+        });
+      }
+
+      const realRoot = await fs.promises.realpath(root);
+      const realFile = await fs.promises.realpath(filePath);
+      const realRelative = path.relative(realRoot, realFile);
+
+      if (
+        realRelative === "" ||
+        realRelative === ".." ||
+        realRelative.startsWith(".." + path.sep) ||
+        path.isAbsolute(realRelative)
+      ) {
+        return res.status(403).json({
+          success: false,
+          message: "Invalid document location."
+        });
+      }
+
+      const fileStat = await fs.promises.stat(realFile);
+
+      if (!fileStat.isFile()) {
+        return res.status(404).json({
+          success: false,
+          message: "Document file unavailable."
+        });
+      }
+
+      res.setHeader("Content-Type", mimeTypes[extension]);
+      res.setHeader("Content-Disposition", "inline");
+      res.setHeader("Cache-Control", "no-store");
+      res.setHeader("X-Content-Type-Options", "nosniff");
+      res.setHeader("Content-Security-Policy", "sandbox");
+
+      return res.sendFile(realFile);
+
+    } catch (error) {
+      if (error.code === "ENOENT") {
+        return res.status(404).json({
+          success: false,
+          message: "Document file unavailable."
+        });
+      }
+
+      console.error("Secure document viewing error:", error.message);
+
+      return res.status(500).json({
+        success: false,
+        message: "Unable to open document."
+      });
+    }
+  }
+);
 module.exports = router;
